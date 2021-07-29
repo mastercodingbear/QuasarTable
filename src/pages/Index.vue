@@ -73,7 +73,6 @@ export default defineComponent({
       ) {
         return
       }
-      e.preventDefault();
       let index = this.getSelctedIndex(this.selectedReference);
       if (this.selectedReference === "") {
         index = 0;
