@@ -1,19 +1,9 @@
 {
     "sections":[
         {
-            "reference":"random",
-            "content":"If 1 is not here then cells referencing 1, e.g. 2, will not show popups",
-            "in-content reference":[[24, 2]]
-        },
-        {
-            "reference":"11",
+            "reference":"1",
             "content":"ABCD efgh ijklmop qrst 4 wxyz",
-            "in-content reference":[[24]]
-        },
-        {
-            "reference":"24",
-            "content":"ABCD efgh ijklmop qrst 4 wxyz",
-            "in-content reference":[[11]]
+            "in-content reference":[[4]]
         },
         {
             "reference":"2",

@@ -54,13 +54,16 @@ export default defineComponent({
       this.referenceData = [];
       for (let i = 0;i < reference.length;i ++) {
         // add block with depth
-        const refer = reference[i].map(element => {
+        const refer = reference[i].filter(element => this.getSelctedIndex(element) >= 0)
+        .map(element => {
+          console.log(element)
           return this.getReferenceCell(element)
         })
         this.referenceData.push(refer);
       }
     },
     getSelctedIndex(reference) {
+      console.log(reference);
       return this.sections.findIndex(element => element['reference'] === `${reference}`);
     },
     getReferenceCell(reference) {
