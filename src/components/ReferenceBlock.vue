@@ -6,7 +6,7 @@
       :backgroundColor="backgroundColor"
       :textColor="textColor"
       :width="width"
-      />
+    />
   </div>
 </template>
 <script>

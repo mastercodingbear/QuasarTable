@@ -7,17 +7,19 @@
       {{contentText}}
     </div>
     <ReferenceBlock v-for="(ref, index) in referenceData" 
-          :depth="index"
-          :reference="ref"
-          :backgroundColor="bg_refer"
-          :textColor="color_refer"
-          :width="400"
-          :show="selected === contentReference"
-        :key="index"
-        />
+      :depth="index"
+      :reference="ref"
+      :backgroundColor="bg_refer"
+      :textColor="color_refer"
+      :width="400"
+      :show="selected === contentReference"
+      :key="index"
+      ref="referenceBlock"
+    />
   </div>
 </template>
 <script>
+import { ref, onMounted, onUpdated, onUnmounted } from 'vue'
 import ReferenceBlock from './ReferenceBlock.vue'
 export default {
   components: {
@@ -33,9 +35,26 @@ export default {
     referenceData: Array,
     selected: String,
   },
+  setup(props, {emit}) {
+    const referenceBlock = ref(null)
+
+    onUpdated(() => {
+      // console.log(referenceBlock.value);
+      if (props.selected === props.contentReference) {
+        if (referenceBlock.value) {
+          const height = referenceBlock.value.$el.clientHeight;
+          emit('referenceHeight', height);
+        } else {
+          emit('referenceHeight', 0);
+        }
+      }
+    })
+    return {
+      referenceBlock
+    }
+  },
   methods: {
-    passSelectedEvent()
-    {
+    passSelectedEvent() {
       this.$emit('selectedCell', this.contentReference);
     }
   },
