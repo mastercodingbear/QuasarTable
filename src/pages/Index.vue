@@ -1,7 +1,32 @@
 <template>
   <q-page class="flex flex-left overflow-auto content-page">
     <div class="contentContainer" ref="contentPage">
-      <ContentCell v-for="(cell, i) of sections" :key="cell.reference"
+      <Draggable
+        @start="onStart"
+        @stop="onStop"
+        @move="onMove">
+        <div>
+          asdf
+        </div>
+      </Draggable>
+
+      <Draggable
+        @start="onStart"
+        @stop="onDrop"
+        @move="onMove"
+      >
+        <div>
+          qwer
+        </div>
+      </Draggable>
+      <group-element v-for="el in data" 
+        :key="el.content" 
+        :elementId="el.id" 
+        :content="el.content" 
+        :level="el.level" 
+        :currentStructure="data" 
+        :references="el.references"/>
+      <!-- <ContentCell v-for="(cell, i) of sections" :key="cell.reference"
         :contentReference="cell.reference"
         :contentText="cell.content"
         :referenceData="referenceData"
@@ -14,7 +39,7 @@
         @referenceHeight="onReferenceHeight($event)"
         :ref="'content-cell-' + (i + 1)"
         class="content-cell"
-      />
+      /> -->
     </div>
   </q-page>
 </template>
@@ -24,13 +49,18 @@ import { defineComponent, ref, onBeforeUpdate } from 'vue';
 import { scroll } from 'quasar'
 import data from '../data/screen.json';
 import ContentCell from '../components/ContentCell.vue';
+import groupElement from '../components/GroupLevel1.vue';
+import { Draggable } from '@braks/revue-draggable';
+
 
 const { getScrollTarget, getVerticalScrollPosition, setVerticalScrollPosition } = scroll
 
 export default defineComponent({
   name: 'PageIndex',
   components: {
-    ContentCell
+    // ContentCell,
+    groupElement,
+    Draggable,
   },
   data: () => {
     // get sections data from .json file
@@ -47,6 +77,140 @@ export default defineComponent({
       color_content: format['reference text color hex'],
       background_refer: format['in-content reference background color hex'],
       color_refer: format['in-content reference text color hex'],
+      currentEvent: {},
+      activeDrags: 0,
+      data: [
+        {
+          id: 1,
+          content: 'Lorem',
+          level: 1,
+          inGroup: false,
+          references: [],
+        },
+        {
+          id: 2,
+          content: 'ipsum',
+          level: 1,
+          inGroup: false,
+          references: [],
+        },
+        {
+          id: 3,
+          content: 'dolor',
+          level: 1,
+          inGroup: false,
+          references: [],
+        },
+        {
+          id: 4,
+          content: 'sit',
+          level: 1,
+          inGroup: false,
+          references: [],
+        },
+        {
+          id: 5,
+          content: 'amet',
+          level: 1,
+          inGroup: false,
+          references: [],
+        },
+        {
+          id: 6,
+          content: 'chunk1',
+          level: 2,
+          inGroup: false,
+          references: [
+            {
+              id: 1,
+              content: 'Lorem',
+              level: 1,
+              inGroup: true,
+              references: [],
+            },
+            {
+              id: 2,
+              content: 'ipsum',
+              level: 1,
+              inGroup: true,
+              references: [],
+            },
+          ],
+        },
+        {
+          id: 7,
+          content: 'chunk2',
+          level: 2,
+          inGroup: false,
+          references: [
+            {
+              id: 3,
+              content: 'dolor',
+              level: 1,
+              inGroup: false,
+              references: [],
+            },
+            {
+              id: 4,
+              content: 'sit',
+              level: 1,
+              inGroup: false,
+              references: [],
+            },
+          ],
+        },
+        {
+          id: 8,
+          content: 'sentence',
+          level: 3,
+          inGroup: true,
+          references: [
+            {
+              id: 6,
+              content: 'chunk1',
+              level: 2,
+              inGroup: true,
+              references: [
+                {
+                  id: 1,
+                  content: 'Lorem',
+                  level: 1,
+                  inGroup: true,
+                  references: [],
+                },
+                {
+                  id: 2,
+                  content: 'ipsum',
+                  level: 1,
+                  inGroup: true,
+                  references: [],
+                },
+              ],
+            },
+            {
+              id: 7,
+              content: 'chunk2',
+              level: 2,
+              inGroup: true,
+              references: [
+                {
+                  id: 3,
+                  content: 'dolor',
+                  level: 1,
+                  inGroup: true,
+                  references: [],
+                },
+                {
+                  id: 4,
+                  content: 'sit',
+                  level: 1,
+                  inGroup: true,
+                  references: [],
+                },
+              ],
+            },],
+        }
+      ],
     }
   },
   setup() {
@@ -62,6 +226,28 @@ export default defineComponent({
     }
   },
   methods: {
+    onMove(e, name) {
+      this.name = name;
+      this.currentEvent = e;
+    },
+    onStart(e, name) {
+      this.name = name;
+      this.currentEvent = e;
+      this.activeDrags++;
+    },
+    onStop() {
+      this.currentEvent = {};
+      this.name = '';
+      this.activeDrags--;
+    },
+    onDrop(e) {
+      this.currentEvent = {};
+      this.activeDrags--;
+      if (e.event.target.classList.contains('drop-target')) {
+        alert('Dropped!');
+        e.event.target.classList.remove('hovered');
+      }
+    },
     onSelected(reference) {
       // save selected reference.
       this.selectedReference = reference;
@@ -80,13 +266,11 @@ export default defineComponent({
       const cellHeight = cell.clientHeight > height ? cell.clientHeight : height;
       const scroll = getVerticalScrollPosition(el);
       if ( scroll + viewHeight < offsetTop + cellHeight ) {
-        console.log('down overflow');
         // scroll down offset
         const downoffset = offsetTop + cellHeight - viewHeight;
         setVerticalScrollPosition(el, downoffset);
       }
       if ( scroll > offsetTop ) {
-        console.log('up overflow');
         // scroll down offset
         // const downoffset = offsetTop + cellHeight - viewHeight;
         setVerticalScrollPosition(el, offsetTop - 25);
@@ -156,7 +340,6 @@ export default defineComponent({
   },
   mounted() {
 	  window.addEventListener('keydown', this._keyListener);
-    console.log("8923urklfjowequf9");
   },
   beforeUnmount() {
     window.removeEventListener('keydown', this._keyListener);
