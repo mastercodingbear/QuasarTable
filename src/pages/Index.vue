@@ -17,20 +17,6 @@
         :path="`${el.id}`"
         :index="index + 1"
         :position="el.position" />
-      <!-- <ContentCell v-for="(cell, i) of sections" :key="cell.reference"
-        :contentReference="cell.reference"
-        :contentText="cell.content"
-        :referenceData="referenceData"
-        :bg_content="background_content"
-        :color_content="color_content"
-        :bg_refer="background_refer"
-        :color_refer="color_refer"
-        :selected="selectedReference"
-        @selectedCell="onSelected($event)"
-        @referenceHeight="onReferenceHeight($event)"
-        :ref="'content-cell-' + (i + 1)"
-        class="content-cell"
-      /> -->
     </div>
   </q-page>
 </template>
@@ -39,9 +25,7 @@
 import { defineComponent, ref, onBeforeUpdate } from 'vue';
 import { scroll } from 'quasar'
 import { useStore } from 'vuex'
-// import data from '../data/screen.json';
-import data from '../data/screen1.json';
-import ContentCell from '../components/ContentCell.vue';
+import data from '../data/cell.json';
 import groupElement from '../components/GroupLevelElement.vue';
 
 const { getScrollTarget, getVerticalScrollPosition, setVerticalScrollPosition } = scroll
@@ -49,19 +33,14 @@ const { getScrollTarget, getVerticalScrollPosition, setVerticalScrollPosition } 
 export default defineComponent({
   name: 'PageIndex',
   components: {
-    // ContentCell,
     groupElement,
   },
   data: () => {
-    // get sections data from .json file
-    // const sections = data['sections'];
-    // get format data from .json file
-    // const format = data['sections format'];
     const cellData = data['sections'];
 
-    const $store = useStore();
-    console.log($store);
-    $store.dispatch('table/updateStructure', cellData);
+    const store = useStore();
+    store.dispatch('table/updateStructure', cellData);
+    const structure = store.getters['table/getStructure'];
 
     return {
       // sections: sections,
@@ -72,7 +51,8 @@ export default defineComponent({
       // color_content: format['reference text color hex'],
       // background_refer: format['in-content reference background color hex'],
       // color_refer: format['in-content reference text color hex'],
-      data: cellData
+      data: structure,
+      store,
     }
   },
   setup() {
@@ -96,6 +76,11 @@ export default defineComponent({
     },
     onDrop(e) {
       console.log(e);
+      if(e.target.classList.contains('contentContainer') || 
+        e.target.classList.contains('content-page')) {
+        
+        this.store.dispatch('table/updateDropOutFlag', true);
+      }
     },
     onSelected(reference) {
       // save selected reference.

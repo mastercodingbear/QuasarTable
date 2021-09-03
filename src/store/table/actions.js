@@ -11,11 +11,21 @@ export const updateDropOutFlag = (context, dropout) => {
 }
 
 export const addCell = (context, cell) => {
-  console.log('addCell', cell)
   context.commit('addCell', cell);
 }
 
-export const updateCellPosition = ({context, getters}, props) => {
-  context.commit('updateCellPosition', {props, getters});
+/**
+ * 
+ * @param {id: number, position: {x: number, y: number}} props
+ */
+export const updateCellPosition = ({commit, getters}, props) => {
+  commit('updateCellPosition', {props, getters});
 }
 
+/**
+ * 
+ * @param {id: number, references: []} props
+ */
+export const updateCellReferences = ({commit, getters}, props) => {
+  commit('updateCellReferences', {props, getters});
+}

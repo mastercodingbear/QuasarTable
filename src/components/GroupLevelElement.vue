@@ -2,7 +2,7 @@
   <component 
     :is="!inGroup ? 'Draggable' : 'div'"
     :handle="!inGroup ? 'strong' : null"
-    :position="!inGroup ? currentPosition : null"
+    :position="!inGroup ? position : null"
     :class="{
       'level1-class': level === 1, 
       'no-pointer-events': activeDrags, 
@@ -25,22 +25,17 @@
         class="dragArea"
         v-if="level > 1"
         v-bind="dragOptions"
-        :list="references" 
+        v-model="getReferences" 
         :group="{ name: 'reference' }"
         :data-key="generatePath"
         @start="onDragStart"
-        :move="onDragMove"
-        :end="onDragEnd"
         @end="onDragEnd"
-        @dragenter="onDragEnter"
-        @dragleave="onDragLeave"
-        @dragstart="onOriginalDragStart"
         :class="{
           'no-pointer-events': dragCellFlag}"
         >
         <div 
           class="dragElement" 
-          v-for="(el, index) in references"
+          v-for="(el, index) in getReferences"
           :key="elementId + ' ' + el.id" 
           :data-key="generatePath + '-' + el.id + ':' + (index + 1)">
           <p 
@@ -54,7 +49,7 @@
             :elementId="el.id" 
             :content="el.content" 
             :level="el.level" 
-            :inGroup="el.inGroup" 
+            :inGroup="el.inGroup"
             :references="el.references"
             :path="generatePath"
             :index="index + 1"
@@ -69,17 +64,42 @@ import { Draggable } from '@braks/revue-draggable';
 import { VueDraggableNext } from 'vue-draggable-next'
 
 import { useStore } from 'vuex'
-import { store } from 'quasar/wrappers';
 
 export default {
   name: 'group-element',
   props: {
+    elementId: {
+      type: Number,
+      required: true,
+    },
+    content: {
+      type: String,
+      required: true,
+    },
+    level: {
+      type: Number,
+      required: true,
+    },
+    inGroup: {
+      type: Boolean,
+      default() {
+        return false;
+      }
+    },
+    references: {
+      type: Array,
+      required: true,
+    },
     path: {
       // cell path
       type: String,
     },
+    index: {
+      // cell index in parent
+      type: Number,
+    },
     position: {
-      // cell position X
+      // cell position
       type: Object,
       default() {
         return {
@@ -88,42 +108,15 @@ export default {
         };
       }
     },
-    index: {
-      // cell index in parent
-      type: Number,
-    },
-    elementId: {
-      type: Number,
-    },
-    content: {
-      type: String
-    },
-    level: {
-      type: Number,
-    },
-    references: {
-      required: true,
-      type: Array,
-    },
-    inGroup: {
-      type: Boolean,
-      default() {
-        return false;
-      }
-    }
   },
   data: (prop) => {
     const store = useStore();
-    console.log(store);
-    const structure = store.state.table.structure;
-
+    const structure = store.getters['table/getCellById']();
     return {
       // floating drag flag
       activeDrags: 0,
-      currentPosition: prop.position,
       dragCell: Object,
       // drag into flag
-      dragOutFlag: false,
       dragCellFlag: 0,
       currentStructure: structure,
       store: store
@@ -131,16 +124,12 @@ export default {
   },
   components: {
     VueDraggableNext,
-    /* eslint-disable */
-    // 'vue-draggable-resizable': VueDraggableResizable,
-    // Vue3DraggableResizable,
     Draggable,
   },
   computed: {
     dragOptions() {
       return {
         animation: 0,
-        // disabled: false,
         ghostClass: 'ghost',
       }
     },
@@ -149,6 +138,18 @@ export default {
         (this.inGroup ? 
         '-' + this.elementId + ':' + this.index : 
         ':' + this.index);
+    },
+    getReferences: {
+      get() {
+        return this.references;
+      },
+      set(value) {
+        this.store.dispatch('table/updateCellReferences', 
+          {
+            id: this.elementId, 
+            references: value
+          })
+      }
     },
   },
   methods: {
@@ -169,8 +170,6 @@ export default {
       
       // update cell position
       const { x, y } = e.data;
-      
-      console.log(this.store);
       this.store.dispatch('table/updateCellPosition', {
         id: this.elementId, 
         position: {x: x, y: y}
@@ -231,54 +230,27 @@ export default {
       }
     },
     onDragStart(e) {
-      this.dragCell = e.item;
-      this.dragCellFlag ++;
-      console.log(this.dragCell);
-    },
-    onDragMove(evt, originalEvent) {
-      console.log(evt);
-      console.log(originalEvent);
+      // set dragOutFlag false
+      this.store.dispatch('table/updateDropOutFlag', false);
     },
     onDragEnd(e) {
 
-      this.dragCellFlag --;
-      console.log(e);
-      
-      const $store = useStore();
-      $store.dispatch('table/updateStructure', newData);
-      if(this.dragOutFlag) {
-        console.log(this.dragCell);
-        // get path from dragIntoCell
-        const dragCellPath = this.dragCell.attributes['data-key'].value;
-        let dragCell = this.findContentByPath(dragCellPath, this.currentStructure);
-        // clone cell
-        let clone = JSON.parse(JSON.stringify(dragCell));
-        clone.inGroup = false;
-        clone.position = {x: 0, y: 0};
-        $store.dispatch('table/addCell', clone);
-      }
-      this.dragOutFlag = false;
-    },
-    onOriginalDragStart(e) {
-      console.log(e);
-    },
-    onOriginalDragEnd(e) {
-      console.log(e);
-    },
-    onDragEnter(e) {
-      if (e.fromElement?.classList.contains('revue-draggable')) {
-        console.log('enter');
-        this.dragOutFlag = false;
-      }
-    },
-    onDragDrop(e) {
-      console.log(e);
-    },
-    onDragLeave(e) {
-      if (e.fromElement?.classList.contains('revue-draggable')) {
-        this.dragOutFlag = true;
-        // TODO: change cursor
-      }
+      // get dragOutFlag from store
+      const drop = this.store.getters['table/getDropoutFlag'];
+      console.log(drop);
+      // // this.store.dispatch('table/updateStructure', newData);
+      // if(this.dragOutFlag) {
+      //   console.log(this.dragCell);
+      //   // get path from dragIntoCell
+      //   const dragCellPath = this.dragCell.attributes['data-key'].value;
+      //   let dragCell = this.findContentByPath(dragCellPath, this.currentStructure);
+      //   // clone cell
+      //   let clone = JSON.parse(JSON.stringify(dragCell));
+      //   clone.inGroup = false;
+      //   clone.position = {x: 0, y: 0};
+      //   $store.dispatch('table/addCell', clone);
+      // }
+      // this.dragOutFlag = false;
     },
     findContentById(id, array, dragIntoCell) {
       const isEmpty = Object.keys(dragIntoCell).length === 0;
