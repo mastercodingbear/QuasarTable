@@ -252,14 +252,26 @@ export default {
       }
     },
     onDragStart(e) {
-      // set dragOutFlag false
-      this.store.dispatch('table/updateDropOutFlag', false);
+      // set dragoutFlag false
+      this.store.dispatch('table/updateDropoutFlag', false);
+      this.store.dispatch('table/updateDropoutCellPath', '');
+      this.dragCell = e.item;
     },
     onDragEnd(e) {
 
-      // get dragOutFlag from store
+      // get dragoutFlag from store
       const drop = this.store.getters['table/getDropoutFlag'];
+      const path = this.store.getters['table/getDropoutPath'];
       console.log(drop);
+      if (drop) {
+        const dragCellPath = this.dragCell.attributes['data-key'].value;
+        let dragCell = this.findCellByPath(dragCellPath, this.currentStructure);
+        // clone cell
+        let clone = JSON.parse(JSON.stringify(dragCell));
+        clone.inGroup = false;
+        clone.position = {x: 0, y: 0};
+        this.store.dispatch('table/addCellById', {id: 0, cell: clone});
+      }
       // // this.store.dispatch('table/updateStructure', newData);
       // if(this.dragOutFlag) {
       //   console.log(this.dragCell);

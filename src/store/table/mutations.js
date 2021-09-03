@@ -10,10 +10,19 @@ export const updateStructure = (state, structure) => {
 /**
  * 
  * @param {*} state 
- * @param {Boolean} structure 
+ * @param {Boolean} dropOutFlag 
  */
-export const updateDropOutFlag = (state, dropout) => {
-  state.dropOutFlag = dropout;
+export const updateDropoutFlag = (state, dropoutFlag) => {
+  state.dropoutFlag = dropoutFlag;
+}
+
+/**
+ * 
+ * @param {*} state 
+ * @param {Boolean} dropoutCellPath 
+ */
+ export const updateDropoutCellPath = (state, dropoutCellPath) => {
+  state.dropoutCellPath = dropoutCellPath;
 }
 
 /**

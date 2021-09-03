@@ -75,11 +75,22 @@ export default defineComponent({
       e.preventDefault();
     },
     onDrop(e) {
-      console.log(e);
+      console.log(e.target);
+      // drop out of group
       if(e.target.classList.contains('contentContainer') || 
         e.target.classList.contains('content-page')) {
-        
-        this.store.dispatch('table/updateDropOutFlag', true);
+        this.store.dispatch('table/updateDropoutFlag', true);
+      }
+      // drop cell onto level 1 element
+      const path = e.target.attributes['data-key']?.value;
+      const steps = path?.split('-');
+      if(steps?.length === 1) {
+        const info = steps[0].split(':');
+        const structure = this.store.getters['table/getStructure'];
+        if(structure[info[1] - 1].level === 1) {
+          this.store.dispatch('table/updateDropoutFlag', true);
+          this.store.dispatch('table/updateDropoutCellPath', path);
+        }
       }
     },
     onSelected(reference) {

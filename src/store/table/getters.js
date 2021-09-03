@@ -3,7 +3,11 @@ export const getStructure = (state) => {
 }
 
 export const getDropoutFlag = (state) => {
-  return state.dropOutFlag;
+  return state.dropoutFlag;
+}
+
+export const getDropoutPath = (state) => {
+  return state.dropoutCellPath;
 }
 
 export const getCellById = (state) => (id) => {

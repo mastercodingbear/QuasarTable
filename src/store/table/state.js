@@ -2,6 +2,7 @@ export default function () {
   return {
     //
     structure: [],
-    dropOutFlag: false,
+    dropoutFlag: false,
+    dropoutCellPath: '',
   }
 }

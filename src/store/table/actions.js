@@ -10,10 +10,19 @@ export const updateStructure = (context, structure) => {
 /**
  * 
  * @param {*} context 
- * @param {Boolean} dropout 
+ * @param {Boolean} dropOutFlag 
  */
-export const updateDropOutFlag = (context, dropout) => {
-  context.commit('updateDropOutFlag', dropout)
+export const updateDropoutFlag = (context, dropOutFlag) => {
+  context.commit('updateDropoutFlag', dropOutFlag)
+}
+
+/**
+ * 
+ * @param {*} context 
+ * @param {String} dropOutCellPath 
+ */
+export const updateDropoutCellPath = (context, dropOutCellPath) => {
+  context.commit('updateDropoutCellPath', dropOutCellPath);
 }
 
 /**
