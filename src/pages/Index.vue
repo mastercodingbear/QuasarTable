@@ -36,7 +36,7 @@ export default defineComponent({
     groupElement,
   },
   data: () => {
-    const cellData = data['sections'];
+    const cellData = data['cells'];
 
     const store = useStore();
     store.dispatch('table/updateStructure', cellData);

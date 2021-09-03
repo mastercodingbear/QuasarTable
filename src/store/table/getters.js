@@ -1,7 +1,3 @@
-/*
-export function someGetter (state) {
-}
-*/
 export const getStructure = (state) => {
   return state.structure;
 }
@@ -16,6 +12,27 @@ export const getCellById = (state) => (id) => {
   return cell;
 }
 
+export const getCellByPath = (state) => (path) => {
+  const steps = path.split('-');
+  let cell = state.structure[getInfofromStep(steps[0]).index];
+  for(let i = 1; i < steps.length; i ++) {
+    cell = cell.references[getInfofromStep(steps[i]).index];
+  }
+  return cell;
+}
+
+export const getParentCellByChildPath = (state) => (path) => {
+  const steps = path.split('-');
+  if (steps.length === 1) {
+    return state.structure;
+  }
+  let parentCell = state.structure[getInfofromStep(steps[0]).index];
+  for(let i = 1; i < steps.length - 1; i ++) {
+    parentCell = parentCell.references[getInfofromStep(steps[i]).index];
+  }
+  return parentCell;
+}
+
 const findCellById = (id, array) => {
   for(let i = 0; i < array.length; i ++) {
     if (array[i].id === id) {
@@ -27,4 +44,10 @@ const findCellById = (id, array) => {
     }
   }
   return {};
+}
+
+const getInfofromStep = (step) => {
+
+  const info = step.split(':');
+  return {id: Number(info[0]), index:(info[1]) - 1};
 }

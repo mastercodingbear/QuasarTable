@@ -36,7 +36,7 @@
         <div 
           class="dragElement" 
           v-for="(el, index) in getReferences"
-          :key="elementId + ' ' + el.id" 
+          :key="el.id" 
           :data-key="generatePath + '-' + el.id + ':' + (index + 1)">
           <p 
             :data-key="generatePath + '-' + el.id + ':' + (index + 1)" 
@@ -111,7 +111,7 @@ export default {
   },
   data: (prop) => {
     const store = useStore();
-    const structure = store.getters['table/getCellById']();
+    const structure = store.getters['table/getStructure'];
     return {
       // floating drag flag
       activeDrags: 0,
@@ -144,9 +144,9 @@ export default {
         return this.references;
       },
       set(value) {
-        this.store.dispatch('table/updateCellReferences', 
+        this.store.dispatch('table/updateCellReferencesByPath', 
           {
-            id: this.elementId, 
+            path: this.generatePath, 
             references: value
           })
       }
@@ -162,7 +162,7 @@ export default {
         e.event.target.classList.contains('dragArea') ||
         e.event.target.classList.contains('move-handle')
         ) {
-        // TODO: preview
+        // TODO: preview cell
       }
     },
     onDrop(e) {
@@ -170,8 +170,8 @@ export default {
       
       // update cell position
       const { x, y } = e.data;
-      this.store.dispatch('table/updateCellPosition', {
-        id: this.elementId, 
+      this.store.dispatch('table/updateCellPositionByPath', {
+        path: this.generatePath, 
         position: {x: x, y: y}
       });
 
@@ -180,13 +180,14 @@ export default {
         e.event.target.classList.contains('dragArea') ||
         e.event.target.classList.contains('move-handle')
         ) {
-        // draggedCell -> dragIntoCell
+        // draggedCell -> dragIntoCell(detected)
         // get path from dragIntoCell
+        const draggedCellSteps = this.generatePath.split('-');
         const dragIntoCellPath = e.event.target.attributes['data-key'].value;
         const dragIntoCellSteps = dragIntoCellPath.split('-');
-        let dragIntoCell = this.findContentByPath(dragIntoCellPath, this.currentStructure);
+        let dragIntoCell = this.findCellByPath(dragIntoCellPath, this.currentStructure);
         // get draggedCell by path
-        let draggedCell = this.findContentByPath(this.generatePath, this.currentStructure);
+        let draggedCell = this.findCellByPath(this.generatePath, this.currentStructure);
         // clone cell
         let clone = JSON.parse(JSON.stringify(draggedCell));
 
@@ -198,35 +199,56 @@ export default {
           console.log('level 1 exception')
           let clone = JSON.parse(JSON.stringify(dragIntoCell));
           clone.inGroup = true;
-          dragIntoCell.references.push(clone);
+          this.store.dispatch('table/addCellByPath', {path: dragIntoCellPath, cell: clone});
         }
+
         // upgrade dragIntoCell level
+        const prevLevel = dragIntoCell.level;
         if ( dragIntoCell.level <= clone.level ) {
           const increase = clone.level - dragIntoCell.level + 1;
-          const tempCellIndex = this.getInfoFromStep(dragIntoCellSteps[0]).index;
-          let tempCell = this.currentStructure[tempCellIndex];
-          tempCell.level += increase;
           // upgrade all steps level in path
-          for (let i = 1; i < dragIntoCellSteps.length; i ++) {
-            const index = this.getInfoFromStep(dragIntoCellSteps[i]).index;
-            tempCell = tempCell.references[index];
-            tempCell.level += increase;
-          }
+          this.store.dispatch('table/increaseLevelByPath', {path: dragIntoCellPath, amount: increase});
         }
+
+        // cell move draggedCell -> dragIntoCell reference
         // upgrade inGroup
         clone.inGroup = true;
-        // move content from draggedCell to dragIntoCell
-        dragIntoCell.references.push(clone);
-        // remove original one - draggedCell
-        const originalCellSteps = this.generatePath.split('-');
-        const originalCellIndex = this.getInfoFromStep(originalCellSteps[0]).index;
-        this.currentStructure.splice(originalCellIndex , 1);
+        // set position
+        clone.position = {x: 0, y: 0};
+        this.store.dispatch('table/addCellByPath', {path: dragIntoCellPath, cell: clone});
+
         // TODO: upgrade other elements position
         // 1. update position of cells which after draggedCell(removed - when original move)
-        // 2. update position of cells which after dragIntoCell(merged)
-        for (let i = originalCellIndex; i < this.currentStructure.length; i ++) {
-          this.currentStructure[i].position.y += clone.level === 1 ? 45 : 150;
+        // 2. update position of cells which after dragIntoCell(exception: upgarde 1 -> n changed height)
+        const draggedCellIndex = this.getInfoFromStep(draggedCellSteps[0]).index;
+        console.log(draggedCellIndex);
+        const removedCellHeight = clone.level === 1 ? 45 : 150;
+        for (let i = draggedCellIndex; i < this.currentStructure.length; i ++) {
+          const path = this.currentStructure[i].id + ':' + (i + 1);
+          const prevPosition = this.currentStructure[i].position;
+          const currentPosition = {x: prevPosition.x, y: prevPosition.y + removedCellHeight};
+          this.store.dispatch('table/updateCellPositionByPath', {
+            path: path, 
+            position: currentPosition
+          });
         }
+        let dragIntoCellIndex = this.getInfoFromStep(dragIntoCellSteps[0]).index;
+        // dragIntoCellIndex = dragIntoCellIndx > dragI
+        console.log(dragIntoCellIndex);
+        if (prevLevel === 1) {
+          const increaseHeight = 150 - 45;
+          for (let i = dragIntoCellIndex + 1; i < this.currentStructure.length; i ++ ) {
+            const path = this.currentStructure[i].id + ':' + (i + 1);
+            const prevPosition = this.currentStructure[i].position;
+            const currentPosition = {x: prevPosition.x, y: prevPosition.y - increaseHeight};
+            this.store.dispatch('table/updateCellPositionByPath', {
+              path: path, 
+              position: currentPosition
+            });
+          }
+        }
+        // remove draggedCell
+        this.store.dispatch('table/removeCellByPath', this.generatePath);
       }
     },
     onDragStart(e) {
@@ -252,19 +274,7 @@ export default {
       // }
       // this.dragOutFlag = false;
     },
-    findContentById(id, array, dragIntoCell) {
-      const isEmpty = Object.keys(dragIntoCell).length === 0;
-      if (!isEmpty) return;
-      for(let i = 0; i < array.length && isEmpty; i ++) {
-        if (array[i].id === id) {
-          dragIntoCell = array[i];
-          return dragIntoCell;
-        } else if(array[i].references.length > 0) {
-          this.findContentById(id, array[i].references, dragIntoCell);
-        }
-      }
-    },
-    findContentByPath(path, structure) {
+    findCellByPath(path, structure) {
       const steps = path.split('-');
       const parentIndex = this.getInfoFromStep(steps[0]).index;
       let cell = structure[parentIndex];
