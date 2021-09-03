@@ -1,0 +1,211 @@
+{
+  "sections": [
+    {
+      "id": 1,
+      "content": "Lorem",
+      "level": 1,
+      "inGroup": false,
+      "references": [],
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": 2,
+      "content": "ipsum",
+      "level": 1,
+      "inGroup": false,
+      "references": [],
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": 3,
+      "content": "dolor",
+      "level": 1,
+      "inGroup": false,
+      "references": [],
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": 4,
+      "content": "sit",
+      "level": 1,
+      "inGroup": false,
+      "references": [],
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": 5,
+      "content": "amet",
+      "level": 1,
+      "inGroup": false,
+      "references": [],
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": 6,
+      "content": "chunk1",
+      "level": 2,
+      "inGroup": false,
+      "references": [
+        {
+          "id": 7,
+          "content": "Lorem",
+          "level": 1,
+          "inGroup": true,
+          "references": [],
+          "position": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "id": 8,
+          "content": "ipsum",
+          "level": 1,
+          "inGroup": true,
+          "references": [],
+          "position": {
+            "x": 0,
+            "y": 0
+          }
+        }
+      ],
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": 9,
+      "content": "chunk2",
+      "level": 2,
+      "inGroup": false,
+      "references": [
+        {
+          "id": 10,
+          "content": "dolor",
+          "level": 1,
+          "inGroup": true,
+          "references": [],
+          "position": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "id": 11,
+          "content": "sit",
+          "level": 1,
+          "inGroup": true,
+          "references": [],
+          "position": {
+            "x": 0,
+            "y": 0
+          }
+        }
+      ],
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": 12,
+      "content": "sentence",
+      "level": 3,
+      "inGroup": false,
+      "references": [
+        {
+          "id": 13,
+          "content": "chunk1",
+          "level": 2,
+          "inGroup": true,
+          "references": [
+            {
+              "id": 14,
+              "content": "Lorem",
+              "level": 1,
+              "inGroup": true,
+              "references": [],
+              "position": {
+                "x": 0,
+                "y": 0
+              }
+            },
+            {
+              "id": 15,
+              "content": "ipsum",
+              "level": 1,
+              "inGroup": true,
+              "references": [],
+              "position": {
+                "x": 0,
+                "y": 0
+              }
+            }
+          ],
+          "position": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "id": 16,
+          "content": "chunk2",
+          "level": 2,
+          "inGroup": true,
+          "references": [
+            {
+              "id": 17,
+              "content": "dolor",
+              "level": 1,
+              "inGroup": true,
+              "references": [],
+              "position": {
+                "x": 0,
+                "y": 0
+              }
+            },
+            {
+              "id": 18,
+              "content": "sit",
+              "level": 1,
+              "inGroup": true,
+              "references": [],
+              "position": {
+                "x": 0,
+                "y": 0
+              }
+            }
+          ],
+          "position": {
+            "x": 0,
+            "y": 0
+          }
+        }
+      ],
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    }
+  ],
+  "position": {
+    "x": 0,
+    "y": 0
+  }
+}

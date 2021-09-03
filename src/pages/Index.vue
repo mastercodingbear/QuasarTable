@@ -1,31 +1,22 @@
 <template>
-  <q-page class="flex flex-left overflow-auto content-page">
-    <div class="contentContainer" ref="contentPage">
-      <Draggable
-        @start="onStart"
-        @stop="onStop"
-        @move="onMove">
-        <div>
-          asdf
-        </div>
-      </Draggable>
-
-      <Draggable
-        @start="onStart"
-        @stop="onDrop"
-        @move="onMove"
-      >
-        <div>
-          qwer
-        </div>
-      </Draggable>
-      <group-element v-for="el in data" 
+  <q-page 
+    class="overflow-auto content-page"
+    @dragenter="onDragEnter"
+    @dragover="onDragOver"
+    @drop="onDrop" >
+    <div 
+      class="contentContainer" 
+      ref="contentPage" >
+      <group-element v-for="(el, index) in data" 
         :key="el.content" 
         :elementId="el.id" 
         :content="el.content" 
         :level="el.level" 
-        :currentStructure="data" 
-        :references="el.references"/>
+        :inGroup="el.inGroup"
+        :references="el.references"
+        :path="`${el.id}`"
+        :index="index + 1"
+        :position="el.position" />
       <!-- <ContentCell v-for="(cell, i) of sections" :key="cell.reference"
         :contentReference="cell.reference"
         :contentText="cell.content"
@@ -47,11 +38,11 @@
 <script>
 import { defineComponent, ref, onBeforeUpdate } from 'vue';
 import { scroll } from 'quasar'
-import data from '../data/screen.json';
+import { useStore } from 'vuex'
+// import data from '../data/screen.json';
+import data from '../data/screen1.json';
 import ContentCell from '../components/ContentCell.vue';
-import groupElement from '../components/GroupLevel1.vue';
-import { Draggable } from '@braks/revue-draggable';
-
+import groupElement from '../components/GroupLevelElement.vue';
 
 const { getScrollTarget, getVerticalScrollPosition, setVerticalScrollPosition } = scroll
 
@@ -60,162 +51,33 @@ export default defineComponent({
   components: {
     // ContentCell,
     groupElement,
-    Draggable,
   },
   data: () => {
     // get sections data from .json file
-    const sections = data['sections'];
+    // const sections = data['sections'];
     // get format data from .json file
-    const format = data['sections format']
+    // const format = data['sections format'];
+    const cellData = data['sections'];
+
+    const $store = useStore();
+    console.log($store);
+    $store.dispatch('table/updateStructure', cellData);
 
     return {
-      sections: sections,
+      // sections: sections,
       selectedReference: "",
       selectedIndex: -1,
       referenceData: [],
-      background_content: format['reference background color hex'],
-      color_content: format['reference text color hex'],
-      background_refer: format['in-content reference background color hex'],
-      color_refer: format['in-content reference text color hex'],
-      currentEvent: {},
-      activeDrags: 0,
-      data: [
-        {
-          id: 1,
-          content: 'Lorem',
-          level: 1,
-          inGroup: false,
-          references: [],
-        },
-        {
-          id: 2,
-          content: 'ipsum',
-          level: 1,
-          inGroup: false,
-          references: [],
-        },
-        {
-          id: 3,
-          content: 'dolor',
-          level: 1,
-          inGroup: false,
-          references: [],
-        },
-        {
-          id: 4,
-          content: 'sit',
-          level: 1,
-          inGroup: false,
-          references: [],
-        },
-        {
-          id: 5,
-          content: 'amet',
-          level: 1,
-          inGroup: false,
-          references: [],
-        },
-        {
-          id: 6,
-          content: 'chunk1',
-          level: 2,
-          inGroup: false,
-          references: [
-            {
-              id: 1,
-              content: 'Lorem',
-              level: 1,
-              inGroup: true,
-              references: [],
-            },
-            {
-              id: 2,
-              content: 'ipsum',
-              level: 1,
-              inGroup: true,
-              references: [],
-            },
-          ],
-        },
-        {
-          id: 7,
-          content: 'chunk2',
-          level: 2,
-          inGroup: false,
-          references: [
-            {
-              id: 3,
-              content: 'dolor',
-              level: 1,
-              inGroup: false,
-              references: [],
-            },
-            {
-              id: 4,
-              content: 'sit',
-              level: 1,
-              inGroup: false,
-              references: [],
-            },
-          ],
-        },
-        {
-          id: 8,
-          content: 'sentence',
-          level: 3,
-          inGroup: true,
-          references: [
-            {
-              id: 6,
-              content: 'chunk1',
-              level: 2,
-              inGroup: true,
-              references: [
-                {
-                  id: 1,
-                  content: 'Lorem',
-                  level: 1,
-                  inGroup: true,
-                  references: [],
-                },
-                {
-                  id: 2,
-                  content: 'ipsum',
-                  level: 1,
-                  inGroup: true,
-                  references: [],
-                },
-              ],
-            },
-            {
-              id: 7,
-              content: 'chunk2',
-              level: 2,
-              inGroup: true,
-              references: [
-                {
-                  id: 3,
-                  content: 'dolor',
-                  level: 1,
-                  inGroup: true,
-                  references: [],
-                },
-                {
-                  id: 4,
-                  content: 'sit',
-                  level: 1,
-                  inGroup: true,
-                  references: [],
-                },
-              ],
-            },],
-        }
-      ],
+      // background_content: format['reference background color hex'],
+      // color_content: format['reference text color hex'],
+      // background_refer: format['in-content reference background color hex'],
+      // color_refer: format['in-content reference text color hex'],
+      data: cellData
     }
   },
   setup() {
-    const contentPage = ref(null)
-    const contentCells = ref([])
+    const contentPage = ref(null);
+    const contentCells = ref([]);
 
     onBeforeUpdate(() => {
       contentCells.value = []
@@ -226,27 +88,14 @@ export default defineComponent({
     }
   },
   methods: {
-    onMove(e, name) {
-      this.name = name;
-      this.currentEvent = e;
+    onDragEnter(e) {
+      e.preventDefault();
     },
-    onStart(e, name) {
-      this.name = name;
-      this.currentEvent = e;
-      this.activeDrags++;
-    },
-    onStop() {
-      this.currentEvent = {};
-      this.name = '';
-      this.activeDrags--;
+    onDragOver(e) {
+      e.preventDefault();
     },
     onDrop(e) {
-      this.currentEvent = {};
-      this.activeDrags--;
-      if (e.event.target.classList.contains('drop-target')) {
-        alert('Dropped!');
-        e.event.target.classList.remove('hovered');
-      }
+      console.log(e);
     },
     onSelected(reference) {
       // save selected reference.
@@ -279,7 +128,7 @@ export default defineComponent({
     addReferenceBlock(index) {
       const reference = this.sections[index]['in-content reference'];
       this.referenceData = [];
-      for (let i = 0;i < reference.length;i ++) {
+      for (let i = 0; i < reference.length; i ++) {
         // add block with depth
         const refer = reference[i].filter(element => this.getSelctedIndex(element) >= 0)
         .map(element => {
@@ -347,6 +196,12 @@ export default defineComponent({
 })
 </script>
 <style lang="scss">
+  .hovered {
+    cursor: pointer;
+  }
+  .no-pointer-event {
+    pointer-events: none;
+  }
   .content-page {
     height: calc(100vh - 50px);
   }

@@ -17,7 +17,8 @@
     "@quasar/extras": "^1.0.0",
     "core-js": "^3.6.5",
     "quasar": "^2.0.0",
-    "vue-draggable-next": "^2.0.1"
+    "vue-draggable-next": "^2.0.1",
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.13.14",
