@@ -3,23 +3,25 @@
     class="move-handle" 
     v-if="!inGroup" 
     :data-key="generatePath">
-    <q-checkbox 
-      size="xs" 
-      v-model="value" 
-      :val="content"
-      v-if="displayType === 'checkbox'" />
-    <q-radio 
-      size="xs" 
-      v-model="value" 
-      :val="content"
-      label=""
-      v-else-if="displayType === 'radio'" />
-    <q-img 
-      style="width: 150px;"
-      :data-key="generatePath"
-      :alt="content"
-      :src="displayValue"
-      v-else-if="displayType === 'image'" />
+    <template v-if="level === 1">
+      <q-checkbox 
+        size="xs" 
+        v-model="value" 
+        :val="content"
+        v-if="displayType === 'checkbox'" />
+      <q-radio 
+        size="xs" 
+        v-model="value" 
+        :val="content"
+        label=""
+        v-else-if="displayType === 'radio'" />
+      <q-img 
+        style="width: 50px; margin-right: 10px;"
+        :data-key="generatePath"
+        :alt="content"
+        :src="displayValue"
+        v-else-if="displayType === 'image'" />
+    </template>
     <strong 
       :data-key="generatePath">
       {{ content }}
