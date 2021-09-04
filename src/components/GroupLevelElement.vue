@@ -223,7 +223,22 @@ export default {
       }
     },
     onAddCell(e) {
-      console.log(e);
+      const draggedCellPath = e.item.attributes['data-key'].value;
+      const draggedCellSteps = draggedCellPath.split('-');
+      const dragIntoCellPath = e.to.attributes['data-key'].value;
+      // upgrade cell level
+      const draggedCellInfo = this.getInfoFromStep(draggedCellSteps[draggedCellSteps.length - 1]);
+      console.log(draggedCellInfo);
+      console.log(this.currentStructure);
+      const draggedCell = this.getCellById(draggedCellInfo.id);
+      let dragIntoCell = this.getCellByPath(dragIntoCellPath);
+      
+      /* upgrade dragIntoCell level */
+      if ( dragIntoCell.level <= draggedCell.level ) {
+        const increase = draggedCell.level - dragIntoCell.level + 1;
+        // upgrade all steps level in path
+        this.store.dispatch('table/increaseLevelByPath', {path: dragIntoCellPath, amount: increase});
+      }
     },
     moveCellByPath(fromPath, toPath) {
       // draggedCell -> dragIntoCell(detected)
@@ -294,6 +309,11 @@ export default {
       }
       // remove draggedCell
       this.store.dispatch('table/removeCellByPath', draggedCellPath);
+    },
+    getCellById(id) {
+      const getCellById = this.store.getters['table/getCellById'];
+      const cell = getCellById(id);
+      return cell;
     },
     getCellByPath(path) {
       const getCellByPath = this.store.getters['table/getCellByPath'];
