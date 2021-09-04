@@ -52,6 +52,7 @@ export default defineComponent({
       // background_refer: format['in-content reference background color hex'],
       // color_refer: format['in-content reference text color hex'],
       data: structure,
+      activeDrags: 0,
       store,
     }
   },
@@ -68,6 +69,12 @@ export default defineComponent({
     }
   },
   methods: {
+    onDragStart(e) {
+      this.activeDrags ++;
+    },
+    onDragEnd(e) {
+      this.activeDrags --;
+    },
     onDragEnter(e) {
       e.preventDefault();
     },
@@ -75,7 +82,6 @@ export default defineComponent({
       e.preventDefault();
     },
     onDrop(e) {
-      console.log(e.target);
       // drop out of group
       if(e.target.classList.contains('contentContainer') || 
         e.target.classList.contains('content-page')) {

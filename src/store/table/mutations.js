@@ -107,13 +107,20 @@ export const removeCellByPath = (state, {path, getters}) => {
   const steps = path.split('-');
   const childInfo = steps[steps.length - 1].split(':');
   const childIndex = childInfo[1] - 1;
-  parentCell.splice(childIndex, 1)
+  if(steps.length === 1) {
+    // remove cell from structure
+    state.structure.splice(childIndex, 1);
+  } else {
+    // remove cell from parentCell references
+    parentCell.references.splice(childIndex, 1);
+  }
 }
 
 /**
  * 
  * @param {*} state 
  * @param {Number} id 
+ * TODO: couldn't get parent cell
  */
 export const removeCellById = (state, {id, getters}) => {
   const cell = getters.getCellById(path);

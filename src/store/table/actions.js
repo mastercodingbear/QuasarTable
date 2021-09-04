@@ -91,6 +91,15 @@ export const removeCellByPath = ({commit, getters}, path) => {
 /**
  * 
  * @param {*} param0 
+ * @param {Number} id 
+ */
+ export const removeCellById = ({commit, getters}, id) => {
+  commit('removeCellById', {id, getters});
+}
+
+/**
+ * 
+ * @param {*} param0 
  * @param {id: Number, amount: Number} props 
  */
 export const increaseLevelById = ({commit, getters}, props) => {
