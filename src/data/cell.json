@@ -6,6 +6,8 @@
       "level": 1,
       "inGroup": false,
       "references": [],
+      "type": "text",
+      "value": "",
       "position": {
         "x": 0,
         "y": 0
@@ -13,10 +15,12 @@
     },
     {
       "id": 2,
-      "content": "ipsum",
+      "content": "ipsum,dolor,sit",
       "level": 1,
       "inGroup": false,
       "references": [],
+      "type": "radio",
+      "value": "",
       "position": {
         "x": 0,
         "y": 0
@@ -24,10 +28,12 @@
     },
     {
       "id": 3,
-      "content": "dolor",
+      "content": "dolor,sit,ipsum",
       "level": 1,
       "inGroup": false,
       "references": [],
+      "type": "checkbox",
+      "value": "",
       "position": {
         "x": 0,
         "y": 0
@@ -39,6 +45,8 @@
       "level": 1,
       "inGroup": false,
       "references": [],
+      "type": "image",
+      "value": "https://placeimg.com/500/300/nature?t=1",
       "position": {
         "x": 0,
         "y": 0
@@ -50,6 +58,8 @@
       "level": 1,
       "inGroup": false,
       "references": [],
+      "type": "text",
+      "value": "",
       "position": {
         "x": 0,
         "y": 0
@@ -67,6 +77,8 @@
           "level": 1,
           "inGroup": true,
           "references": [],
+          "type": "text",
+          "value": "",
           "position": {
             "x": 0,
             "y": 0
@@ -78,12 +90,16 @@
           "level": 1,
           "inGroup": true,
           "references": [],
+          "type": "text",
+          "value": "",
           "position": {
             "x": 0,
             "y": 0
           }
         }
       ],
+      "type": "text",
+      "value": "",
       "position": {
         "x": 0,
         "y": 0
@@ -101,6 +117,8 @@
           "level": 1,
           "inGroup": true,
           "references": [],
+          "type": "text",
+          "value": "",
           "position": {
             "x": 0,
             "y": 0
@@ -112,12 +130,16 @@
           "level": 1,
           "inGroup": true,
           "references": [],
+          "type": "text",
+          "value": "",
           "position": {
             "x": 0,
             "y": 0
           }
         }
       ],
+      "type": "text",
+      "value": "",
       "position": {
         "x": 0,
         "y": 0
@@ -141,6 +163,8 @@
               "level": 1,
               "inGroup": true,
               "references": [],
+              "type": "text",
+              "value": "",
               "position": {
                 "x": 0,
                 "y": 0
@@ -152,12 +176,16 @@
               "level": 1,
               "inGroup": true,
               "references": [],
+              "type": "text",
+              "value": "",
               "position": {
                 "x": 0,
                 "y": 0
               }
             }
           ],
+          "type": "text",
+          "value": "",
           "position": {
             "x": 0,
             "y": 0
@@ -175,6 +203,8 @@
               "level": 1,
               "inGroup": true,
               "references": [],
+              "type": "text",
+              "value": "",
               "position": {
                 "x": 0,
                 "y": 0
@@ -186,24 +216,32 @@
               "level": 1,
               "inGroup": true,
               "references": [],
+              "type": "text",
+              "value": "",
               "position": {
                 "x": 0,
                 "y": 0
               }
             }
           ],
+          "type": "text",
+          "value": "",
           "position": {
             "x": 0,
             "y": 0
           }
         }
       ],
+      "type": "text",
+      "value": "",
       "position": {
         "x": 0,
         "y": 0
       }
     }
   ],
+  "type": "text",
+  "value": "",
   "position": {
     "x": 0,
     "y": 0

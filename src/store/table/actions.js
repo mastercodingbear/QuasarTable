@@ -80,8 +80,25 @@ export const updateCellReferencesById = ({commit, getters}, props) => {
 }
 
 /**
+ * @param {*} context 
+ * @param {id: Number, value: String} props
+ */
+ export const updateCellDisplayValueById = ({commit, getters}, props) => {
+  commit('updateCellDisplayValueById', {props, getters});
+}
+
+
+/**
+ * @param {*} context 
+ * @param {path: String, value: String} props
+ */
+ export const updateCellDisplayValueByPath = ({commit, getters}, props) => {
+  commit('updateCellDisplayValueByPath', {props, getters});
+}
+
+/**
  * 
- * @param {*} param0 
+ * @param {*} context 
  * @param {String} path 
  */
 export const removeCellByPath = ({commit, getters}, path) => {
@@ -90,7 +107,7 @@ export const removeCellByPath = ({commit, getters}, path) => {
 
 /**
  * 
- * @param {*} param0 
+ * @param {*} context 
  * @param {Number} id 
  */
  export const removeCellById = ({commit, getters}, id) => {
@@ -99,7 +116,7 @@ export const removeCellByPath = ({commit, getters}, path) => {
 
 /**
  * 
- * @param {*} param0 
+ * @param {*} context 
  * @param {id: Number, amount: Number} props 
  */
 export const increaseLevelById = ({commit, getters}, props) => {
@@ -108,7 +125,7 @@ export const increaseLevelById = ({commit, getters}, props) => {
 
 /**
  * 
- * @param {*} param0 
+ * @param {*} context 
  * @param {path: String, amount: Number} props 
  */
  export const increaseLevelByPath = ({commit, getters}, props) => {

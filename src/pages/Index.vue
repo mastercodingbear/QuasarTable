@@ -14,6 +14,8 @@
         :level="el.level" 
         :inGroup="el.inGroup"
         :references="el.references"
+        :displayType="el.type"
+        :displayValue="el.value"
         :path="`${el.id}`"
         :index="index + 1"
         :position="el.position" />

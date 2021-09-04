@@ -15,12 +15,16 @@
     :data-key="generatePath"
     >
     <component :is="!inGroup ? 'div' : 'v-fragment'">
-      <strong 
-        class="move-handle" 
-        v-if="!inGroup" 
-        :data-key="generatePath">
-        {{ content + ' - id: ' + elementId + ', level: ' + level }}
-      </strong>
+      <ElementHeader 
+        :elementId="elementId"
+        :content="content"
+        :level="level"
+        :inGroup="inGroup"
+        :displayType="displayType"
+        :displayValue="displayValue"
+        :path="path"
+        :index="index"
+      />
       <VueDraggableNext 
         class="dragArea"
         v-if="level > 1"
@@ -39,11 +43,17 @@
           v-for="(el, index) in getReferences"
           :key="el.id" 
           :data-key="generatePath + '-' + el.id + ':' + (index + 1)">
-          <p 
-            :data-key="generatePath + '-' + el.id + ':' + (index + 1)" 
-            v-if="el.level === 1">
-            {{ el.content }}
-          </p>
+          
+          <ElementContent
+            :elementId="el.id"
+            :content="el.content"
+            :level="el.level"
+            :inGroup="el.inGroup"
+            :displayType="el.type"
+            :displayValue="el.value"
+            :path="generatePath"
+            :index="index + 1"
+          />
           <group-element 
             v-if="el.level > 1"
             :key="el.content" 
@@ -52,6 +62,8 @@
             :level="el.level" 
             :inGroup="el.inGroup"
             :references="el.references"
+            :displayType="el.type"
+            :displayValue="el.value"
             :path="generatePath"
             :index="index + 1"
             :position="el.position" />
@@ -63,7 +75,9 @@
 <script>
 import { Draggable } from '@braks/revue-draggable';
 import { VueDraggableNext } from 'vue-draggable-next'
-
+import ElementHeader from './ElementHeader.vue'
+import ElementContent from './ElementContent.vue'
+import { ref } from 'vue'
 import { useStore } from 'vuex'
 
 export default {
@@ -91,13 +105,23 @@ export default {
       type: Array,
       required: true,
     },
+    displayType: {
+      type: String,
+      required: true,
+    },
+    displayValue: {
+      type: String,
+      required: true,
+    },
     path: {
       // cell path
       type: String,
+      required: true,
     },
     index: {
       // cell index in parent
       type: Number,
+      required: true,
     },
     position: {
       // cell position
@@ -110,9 +134,13 @@ export default {
       }
     },
   },
-  data: (prop) => {
+  data: (props) => {
     const store = useStore();
     const structure = store.getters['table/getStructure'];
+    let displayValue = props.displayValue;
+    if(props.displayType === "checkbox") {
+      displayValue = displayValue.split(',');
+    }
     return {
       // floating drag flag
       activeDrags: 0,
@@ -120,12 +148,15 @@ export default {
       // drag into flag
       dragCellFlag: 0,
       currentStructure: structure,
-      store: store
+      store: store,
+      value: ref(displayValue),
     };
   },
   components: {
     VueDraggableNext,
     Draggable,
+    ElementHeader,
+    ElementContent,
   },
   computed: {
     dragOptions() {
@@ -228,8 +259,6 @@ export default {
       const dragIntoCellPath = e.to.attributes['data-key'].value;
       // upgrade cell level
       const draggedCellInfo = this.getInfoFromStep(draggedCellSteps[draggedCellSteps.length - 1]);
-      console.log(draggedCellInfo);
-      console.log(this.currentStructure);
       const draggedCell = this.getCellById(draggedCellInfo.id);
       let dragIntoCell = this.getCellByPath(dragIntoCellPath);
       
@@ -283,7 +312,7 @@ export default {
       // 2. update position of cells which after dragIntoCell(exception: upgarde 1 -> n changed height)
       if (draggedCellSteps.length === 1) {
         const draggedCellIndex = this.getInfoFromStep(draggedCellSteps[0]).index;
-        const removedCellHeight = clone.level === 1 ? 45 : 150;
+        const removedCellHeight = clone.level === 1 ? 52 : 150;
         for (let i = draggedCellIndex; i < this.currentStructure.length; i ++) {
           const path = this.currentStructure[i].id + ':' + (i + 1);
           const prevPosition = this.currentStructure[i].position;
@@ -296,7 +325,7 @@ export default {
       }
       let dragIntoCellIndex = this.getInfoFromStep(dragIntoCellSteps[0]).index;
       if (prevLevel === 1) {
-        const increaseHeight = 150 - 45;
+        const increaseHeight = 150 - 52;
         for (let i = dragIntoCellIndex + 1; i < this.currentStructure.length; i ++ ) {
           const path = this.currentStructure[i].id + ':' + (i + 1);
           const prevPosition = this.currentStructure[i].position;
@@ -332,7 +361,7 @@ p {
   margin: 0px;
 }
 .revue-draggable {
-  padding: 10px 15px;
+  padding: 5px;
   width: 400px;
   height: 150px;
   overflow-y: auto;
@@ -344,7 +373,9 @@ p {
 }
 .level1-class {
   width: max-content;
-  height: 45px;
+  height: 52px;
+  display: flex;
+  align-items: center;
 }
 .dragArea {
   min-height: 40px;
@@ -355,6 +386,8 @@ p {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
+  text-align: center;
+  vertical-align:center;
 }
 .dragElement {
   display: flex;

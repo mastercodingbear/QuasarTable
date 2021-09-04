@@ -100,6 +100,28 @@ export const updateCellReferencesById = (state, {props, getters}) => {
 /**
  * 
  * @param {*} state
+ * @param {id: Number, value: String} props
+ */
+ export const updateCellDisplayValueById = (state, {props, getters}) => {
+  const {id, value} = props;
+  const cell = getters.getCellById(id);
+  cell.value = value;
+}
+
+/**
+ * 
+ * @param {*} state
+ * @param {path: String, value: String} props
+ */
+ export const updateCellDisplayValueByPath = (state, {props, getters}) => {
+  const {path, value} = props;
+  const cell = getters.getCellByPath(path);
+  cell.value = value;
+}
+
+/**
+ * 
+ * @param {*} state
  * @param {String} path
  */
 export const removeCellByPath = (state, {path, getters}) => {
