@@ -30,6 +30,7 @@
         :data-key="generatePath"
         @start="onDragCellStart"
         @end="onDragCellEnd"
+        @add="onAddCell"
         :class="{
           'no-pointer-events': dragCellFlag}"
         >
@@ -194,8 +195,21 @@ export default {
 
       // get dragoutFlag from store
       const drop = this.store.getters['table/getDropoutFlag'];
+      // drop onto level1 element
       const path = this.store.getters['table/getDropoutPath'];
-      if (drop && e.newIndex === e.oldIndex) {
+      console.log();
+      if (!drop) {
+        return true;
+      }
+      // except 2 cases : move cell to other or change order in same cell
+      if (e.from !== e.to || (e.from === e.to && e.newIndex !== e.oldIndex)) {
+        return true;
+      }
+      if (path) {
+        // drag onto level1 element
+        const dragCellPath = this.dragCell.attributes['data-key'].value;
+        this.moveCellByPath(dragCellPath, path);
+      } else {
         const dragCellPath = this.dragCell.attributes['data-key'].value;
         const dragCell = this.getCellByPath(dragCellPath);
         console.log(dragCell);
@@ -206,8 +220,10 @@ export default {
         this.store.dispatch('table/addCellById', {id: 0, cell: clone});
         // remove cell
         this.store.dispatch('table/removeCellByPath', dragCellPath);
-        
       }
+    },
+    onAddCell(e) {
+      console.log(e);
     },
     moveCellByPath(fromPath, toPath) {
       // draggedCell -> dragIntoCell(detected)
@@ -248,18 +264,20 @@ export default {
       this.store.dispatch('table/addCellByPath', {path: dragIntoCellPath, cell: clone});
 
       // TODO: upgrade other elements position
-      // 1. update position of cells which after draggedCell(removed - when original move)
+      // 1. update position of cells which after draggedCell(removed - when main cell move)
       // 2. update position of cells which after dragIntoCell(exception: upgarde 1 -> n changed height)
-      const draggedCellIndex = this.getInfoFromStep(draggedCellSteps[0]).index;
-      const removedCellHeight = clone.level === 1 ? 45 : 150;
-      for (let i = draggedCellIndex; i < this.currentStructure.length; i ++) {
-        const path = this.currentStructure[i].id + ':' + (i + 1);
-        const prevPosition = this.currentStructure[i].position;
-        const currentPosition = {x: prevPosition.x, y: prevPosition.y + removedCellHeight};
-        this.store.dispatch('table/updateCellPositionByPath', {
-          path: path, 
-          position: currentPosition
-        });
+      if (draggedCellSteps.length === 1) {
+        const draggedCellIndex = this.getInfoFromStep(draggedCellSteps[0]).index;
+        const removedCellHeight = clone.level === 1 ? 45 : 150;
+        for (let i = draggedCellIndex; i < this.currentStructure.length; i ++) {
+          const path = this.currentStructure[i].id + ':' + (i + 1);
+          const prevPosition = this.currentStructure[i].position;
+          const currentPosition = {x: prevPosition.x, y: prevPosition.y + removedCellHeight};
+          this.store.dispatch('table/updateCellPositionByPath', {
+            path: path, 
+            position: currentPosition
+          });
+        }
       }
       let dragIntoCellIndex = this.getInfoFromStep(dragIntoCellSteps[0]).index;
       if (prevLevel === 1) {
