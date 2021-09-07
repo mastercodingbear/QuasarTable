@@ -70,34 +70,33 @@
       "content": "chunk1",
       "level": 2,
       "inGroup": false,
-      "references": [
-        {
-          "id": 7,
-          "content": "Lorem",
-          "level": 1,
-          "inGroup": true,
-          "references": [],
-          "type": "text",
-          "value": "",
-          "position": {
-            "x": 0,
-            "y": 0
-          }
-        },
-        {
-          "id": 8,
-          "content": "ipsum",
-          "level": 1,
-          "inGroup": true,
-          "references": [],
-          "type": "text",
-          "value": "",
-          "position": {
-            "x": 0,
-            "y": 0
-          }
-        }
-      ],
+      "references": [ 7, 8 ],
+      "type": "text",
+      "value": "",
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": 7,
+      "content": "Lorem",
+      "level": 1,
+      "inGroup": true,
+      "references": [],
+      "type": "text",
+      "value": "",
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": 8,
+      "content": "ipsum",
+      "level": 1,
+      "inGroup": true,
+      "references": [],
       "type": "text",
       "value": "",
       "position": {
@@ -110,34 +109,33 @@
       "content": "chunk2",
       "level": 2,
       "inGroup": false,
-      "references": [
-        {
-          "id": 10,
-          "content": "dolor",
-          "level": 1,
-          "inGroup": true,
-          "references": [],
-          "type": "text",
-          "value": "",
-          "position": {
-            "x": 0,
-            "y": 0
-          }
-        },
-        {
-          "id": 11,
-          "content": "sit",
-          "level": 1,
-          "inGroup": true,
-          "references": [],
-          "type": "text",
-          "value": "",
-          "position": {
-            "x": 0,
-            "y": 0
-          }
-        }
-      ],
+      "references": [ 10, 11 ],
+      "type": "text",
+      "value": "",
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": 10,
+      "content": "dolor",
+      "level": 1,
+      "inGroup": true,
+      "references": [],
+      "type": "text",
+      "value": "",
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": 11,
+      "content": "sit",
+      "level": 1,
+      "inGroup": true,
+      "references": [],
       "type": "text",
       "value": "",
       "position": {
@@ -150,88 +148,85 @@
       "content": "sentence",
       "level": 3,
       "inGroup": false,
-      "references": [
-        {
-          "id": 13,
-          "content": "chunk1",
-          "level": 2,
-          "inGroup": true,
-          "references": [
-            {
-              "id": 14,
-              "content": "Lorem",
-              "level": 1,
-              "inGroup": true,
-              "references": [],
-              "type": "text",
-              "value": "",
-              "position": {
-                "x": 0,
-                "y": 0
-              }
-            },
-            {
-              "id": 15,
-              "content": "ipsum",
-              "level": 1,
-              "inGroup": true,
-              "references": [],
-              "type": "text",
-              "value": "",
-              "position": {
-                "x": 0,
-                "y": 0
-              }
-            }
-          ],
-          "type": "text",
-          "value": "",
-          "position": {
-            "x": 0,
-            "y": 0
-          }
-        },
-        {
-          "id": 16,
-          "content": "chunk2",
-          "level": 2,
-          "inGroup": true,
-          "references": [
-            {
-              "id": 17,
-              "content": "dolor",
-              "level": 1,
-              "inGroup": true,
-              "references": [],
-              "type": "text",
-              "value": "",
-              "position": {
-                "x": 0,
-                "y": 0
-              }
-            },
-            {
-              "id": 18,
-              "content": "sit",
-              "level": 1,
-              "inGroup": true,
-              "references": [],
-              "type": "text",
-              "value": "",
-              "position": {
-                "x": 0,
-                "y": 0
-              }
-            }
-          ],
-          "type": "text",
-          "value": "",
-          "position": {
-            "x": 0,
-            "y": 0
-          }
-        }
-      ],
+      "references": [ 13, 16 ],
+      "type": "text",
+      "value": "",
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": 13,
+      "content": "chunk1",
+      "level": 2,
+      "inGroup": true,
+      "references": [ 14, 15 ],
+      "type": "text",
+      "value": "",
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": 14,
+      "content": "Lorem",
+      "level": 1,
+      "inGroup": true,
+      "references": [],
+      "type": "text",
+      "value": "",
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": 15,
+      "content": "ipsum",
+      "level": 1,
+      "inGroup": true,
+      "references": [],
+      "type": "text",
+      "value": "",
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": 16,
+      "content": "chunk2",
+      "level": 2,
+      "inGroup": true,
+      "references": [ 17, 18 ],
+      "type": "text",
+      "value": "",
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": 17,
+      "content": "dolor",
+      "level": 1,
+      "inGroup": true,
+      "references": [],
+      "type": "text",
+      "value": "",
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": 18,
+      "content": "sit",
+      "level": 1,
+      "inGroup": true,
+      "references": [],
       "type": "text",
       "value": "",
       "position": {
@@ -239,11 +234,5 @@
         "y": 0
       }
     }
-  ],
-  "type": "text",
-  "value": "",
-  "position": {
-    "x": 0,
-    "y": 0
-  }
+  ]
 }

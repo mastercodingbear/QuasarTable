@@ -6,8 +6,9 @@
         size="xs" 
         v-model="value" 
         v-for="val in groups"
-        @update:model-value="onUpdate"
+        @update:modelValue="onUpdate"
         :val="val"
+        :id="elementId"
         :key="val"
         :label="val" />
     </template>
@@ -17,7 +18,9 @@
         size="xs" 
         v-model="value" 
         v-for="val in groups"
+        @update:modelValue="onUpdate"
         :val="val"
+        :id="elementId"
         :key="val"
         :label="val" />
     </template>
@@ -25,12 +28,14 @@
       v-else-if="displayType === 'image'" >
       <q-img 
         style="width: 150px"
+        :id="elementId"
         :data-key="generatePath"
         :alt="content"
         :src="displayValue"/>
     </template>
     <template v-else >
       <p 
+        :id="elementId"
         :data-key="generatePath" >
         {{ content }}
       </p>
@@ -104,8 +109,10 @@ export default {
   },
   methods: {
     onUpdate(value, evt) {
-      console.log(value);
-      const displayValue = value.join(',');
+      let displayValue = value;
+      if (this.displayType === "checkbox") {
+        displayValue = value.join(',');
+      }
       this.store.dispatch('table/updateCellDisplayValueByPath', {path: this.generatePath, value: displayValue})
     }
   },

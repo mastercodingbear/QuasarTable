@@ -11,10 +11,23 @@
       start: !inGroup ? onDragGroupStart : null, 
       stop: !inGroup ? onDragGroupDrop : null,
       move: !inGroup ? onDragGroupMove : null,
+      touchstart: onStop,
+      contextmenu: onStop,
     }"
-    :data-key="generatePath"
-    >
-    <component :is="!inGroup ? 'div' : 'v-fragment'">
+    :data-key="generatePath" >
+    <div>
+      <q-menu
+        touch-position
+        context-menu
+        :modelValue="bContextMenuOpened"
+        @update:modelValue="bContextMenuOpened = $event"
+      >
+        <q-list dense style="min-width: 100px">
+          <q-item clickable v-close-popup>
+            <q-item-section>{{generatePath}}</q-item-section>
+          </q-item>
+        </q-list>
+      </q-menu>
       <ElementHeader 
         :elementId="elementId"
         :content="content"
@@ -30,46 +43,47 @@
         v-if="level > 1"
         v-bind="dragOptions"
         v-model="getReferences" 
-        :group="{ name: 'reference' }"
+        :id="elementId"
+        :group="{ name: 'reference', pull: onCtrl ? 'clone' : null}"
         :data-key="generatePath"
         @start="onDragCellStart"
         @end="onDragCellEnd"
         @add="onAddCell"
         :class="{
-          'no-pointer-events': dragCellFlag}"
-        >
+          'no-pointer-events': dragCellFlag}" >
         <div 
           class="dragElement" 
-          v-for="(el, index) in getReferences"
-          :key="el.id" 
-          :data-key="generatePath + '-' + el.id + ':' + (index + 1)">
-          
+          v-for="(refId, index) in getReferences"
+          :id="refId"
+          :key="refId" 
+          :data-key="generatePath + '-' + refId + ':' + (index + 1)"
+          >
           <ElementContent
-            :elementId="el.id"
-            :content="el.content"
-            :level="el.level"
-            :inGroup="el.inGroup"
-            :displayType="el.type"
-            :displayValue="el.value"
+            :elementId="refId"
+            :content="getCellById(refId).content"
+            :level="getCellById(refId).level"
+            :inGroup="getCellById(refId).inGroup"
+            :displayType="getCellById(refId).type"
+            :displayValue="getCellById(refId).value"
             :path="generatePath"
             :index="index + 1"
           />
           <group-element 
-            v-if="el.level > 1"
-            :key="el.content" 
-            :elementId="el.id" 
-            :content="el.content" 
-            :level="el.level" 
-            :inGroup="el.inGroup"
-            :references="el.references"
-            :displayType="el.type"
-            :displayValue="el.value"
+            v-if="getCellById(refId).level > 1"
+            :key="getCellById(refId).content" 
+            :elementId="refId" 
+            :content="getCellById(refId).content" 
+            :level="getCellById(refId).level" 
+            :inGroup="getCellById(refId).inGroup"
+            :references="getCellById(refId).references"
+            :displayType="getCellById(refId).type"
+            :displayValue="getCellById(refId).value"
             :path="generatePath"
             :index="index + 1"
-            :position="el.position" />
+            :position="getCellById(refId).position" />
         </div>
       </VueDraggableNext>
-    </component>
+    </div>
   </component>
 </template>
 <script>
@@ -82,6 +96,12 @@ import { useStore } from 'vuex'
 
 export default {
   name: 'group-element',
+  components: {
+    VueDraggableNext,
+    Draggable,
+    ElementHeader,
+    ElementContent,
+  },
   props: {
     elementId: {
       type: Number,
@@ -137,10 +157,6 @@ export default {
   data: (props) => {
     const store = useStore();
     const structure = store.getters['table/getStructure'];
-    let displayValue = props.displayValue;
-    if(props.displayType === "checkbox") {
-      displayValue = displayValue.split(',');
-    }
     return {
       // floating drag flag
       activeDrags: 0,
@@ -149,14 +165,9 @@ export default {
       dragCellFlag: 0,
       currentStructure: structure,
       store: store,
-      value: ref(displayValue),
+      bContextMenuOpened: false,
+      onCtrl: false,
     };
-  },
-  components: {
-    VueDraggableNext,
-    Draggable,
-    ElementHeader,
-    ElementContent,
   },
   computed: {
     dragOptions() {
@@ -184,7 +195,14 @@ export default {
       }
     },
   },
+  updated() {
+    // console.log('asdf');
+    // TODO leader line
+  },
   methods: {
+    onStop(e) {
+      e.stopPropagation();
+    },
     onDragGroupStart() {
       this.activeDrags ++;
     },
@@ -202,8 +220,8 @@ export default {
       
       // update cell position
       const { x, y } = e.data;
-      this.store.dispatch('table/updateCellPositionByPath', {
-        path: this.generatePath, 
+      this.store.dispatch('table/updateCellPositionById', {
+        id: this.elementId, 
         position: {x: x, y: y}
       });
       // detect drag event onto other cell
@@ -213,7 +231,7 @@ export default {
         ) {
         // draggedCell -> dragIntoCell(detected)
         const dragIntoCellPath = e.event.target.attributes['data-key'].value;
-        this.moveCellByPath(this.generatePath, dragIntoCellPath);
+        this.moveCell(this.generatePath, dragIntoCellPath);
       }
     },
     onDragCellStart(e) {
@@ -239,16 +257,15 @@ export default {
       if (path) {
         // drag onto level1 element
         const dragCellPath = this.dragCell.attributes['data-key'].value;
-        this.moveCellByPath(dragCellPath, path);
+        this.moveCell(dragCellPath, path);
       } else {
         const dragCellPath = this.dragCell.attributes['data-key'].value;
         const dragCell = this.getCellByPath(dragCellPath);
-        console.log(dragCell);
         // clone cell
         let clone = JSON.parse(JSON.stringify(dragCell));
         clone.inGroup = false;
         clone.position = {x: 0, y: 0};
-        this.store.dispatch('table/addCellById', {id: 0, cell: clone});
+        this.store.dispatch('table/insertCell', clone);
         // remove cell
         this.store.dispatch('table/removeCellByPath', dragCellPath);
       }
@@ -269,61 +286,65 @@ export default {
         this.store.dispatch('table/increaseLevelByPath', {path: dragIntoCellPath, amount: increase});
       }
     },
-    moveCellByPath(fromPath, toPath) {
+    onContextMenuOpen(value) {
+      console.log(this.generatePath + '- ' + value);
+      this.bContextMenuOpened = value;
+    },
+    moveCell(fromPath, toPath) {
+      // console.log(fromPath);
       // draggedCell -> dragIntoCell(detected)
-      // get path from dragIntoCell
+      // get draggedCell by Id
       const draggedCellPath = fromPath;
       const dragIntoCellPath = toPath;
-      const draggedCellSteps = draggedCellPath.split('-');
-      const dragIntoCellSteps = dragIntoCellPath.split('-');
-      let dragIntoCell = this.getCellByPath(dragIntoCellPath);
-      // get draggedCell by path
-      let draggedCell = this.getCellByPath(draggedCellPath);
+      const fromId = this.getCellInfofromPath(draggedCellPath).id;
+      const toId = this.getCellInfofromPath(dragIntoCellPath).id;
+      let draggedCell = this.getCellById(fromId);
+      // get path from dragIntoCell
+      let dragIntoCell = this.getCellById(toId);
       // clone cell
-      let clone = JSON.parse(JSON.stringify(draggedCell));
+      // let clone = JSON.parse(JSON.stringify(draggedCell));
 
       /**
-       * Merge draggedCell into dragIntoCell
+       * Move draggedCell into dragIntoCell
        */
-      // exception: level 1 -> level 1 push reference itself
+      // exception: level 1 -> level 1 push itself to reference 
       if ( dragIntoCell.level === 1 ) {
         let clone = JSON.parse(JSON.stringify(dragIntoCell));
         clone.inGroup = true;
-        this.store.dispatch('table/addCellByPath', {path: dragIntoCellPath, cell: clone});
+        this.store.dispatch('table/insertCell', clone).then(newId => {
+          this.store.dispatch('table/addCelltoRefById', {fromId: newId, toId: toId});
+        });
       }
-
       /* upgrade dragIntoCell level */
       const prevLevel = dragIntoCell.level;
-      if ( dragIntoCell.level <= clone.level ) {
-        const increase = clone.level - dragIntoCell.level + 1;
+      if ( prevLevel <= draggedCell.level ) {
+        const increase = draggedCell.level - dragIntoCell.level + 1;
         // upgrade all steps level in path
         this.store.dispatch('table/increaseLevelByPath', {path: dragIntoCellPath, amount: increase});
       }
-
-      /* cell move draggedCell -> dragIntoCell reference */
-      // upgrade inGroup
-      clone.inGroup = true;
-      // set position
-      clone.position = {x: 0, y: 0};
-      this.store.dispatch('table/addCellByPath', {path: dragIntoCellPath, cell: clone});
-
       // TODO: upgrade other elements position
-      // 1. update position of cells which after draggedCell(removed - when main cell move)
+      // 1. update position of cells which after draggedCell(if main cell move)
       // 2. update position of cells which after dragIntoCell(exception: upgarde 1 -> n changed height)
-      if (draggedCellSteps.length === 1) {
-        const draggedCellIndex = this.getInfoFromStep(draggedCellSteps[0]).index;
-        const removedCellHeight = clone.level === 1 ? 52 : 150;
+      if (!draggedCell.inGroup) {
+        // main cell
+        const draggedCellIndex = this.getMainCellInfofromPath(draggedCellPath).index;
+        const removedCellHeight = draggedCell.level === 1 ? 52 : 150;
         for (let i = draggedCellIndex; i < this.currentStructure.length; i ++) {
-          const path = this.currentStructure[i].id + ':' + (i + 1);
+          if (this.currentStructure[i].inGroup === true) {
+            continue;
+          }
           const prevPosition = this.currentStructure[i].position;
           const currentPosition = {x: prevPosition.x, y: prevPosition.y + removedCellHeight};
-          this.store.dispatch('table/updateCellPositionByPath', {
-            path: path, 
+          this.store.dispatch('table/updateCellPositionById', {
+            id: this.currentStructure[i].id, 
             position: currentPosition
           });
         }
+      } else {
+        // remove cell from parent
+        this.store.dispatch('table/removeCellByPath', draggedCellPath);
       }
-      let dragIntoCellIndex = this.getInfoFromStep(dragIntoCellSteps[0]).index;
+      let dragIntoCellIndex = this.getCellInfofromPath(dragIntoCellPath).index;
       if (prevLevel === 1) {
         const increaseHeight = 150 - 52;
         for (let i = dragIntoCellIndex + 1; i < this.currentStructure.length; i ++ ) {
@@ -336,8 +357,18 @@ export default {
           });
         }
       }
-      // remove draggedCell
-      this.store.dispatch('table/removeCellByPath', draggedCellPath);
+      /* cell move draggedCell -> dragIntoCell reference */
+      // upgrade inGroup
+      this.store.dispatch('table/updateCellMemberById', {
+        id: fromId, 
+        inGroup: true
+      });
+      // set position
+      this.store.dispatch('table/updateCellPositionById', {
+        id: fromId, 
+        position: {x: 0, y: 0}
+      });
+      this.store.dispatch('table/addCelltoRefById', {fromId: fromId, toId: toId});
     },
     getCellById(id) {
       const getCellById = this.store.getters['table/getCellById'];
@@ -345,13 +376,29 @@ export default {
       return cell;
     },
     getCellByPath(path) {
-      const getCellByPath = this.store.getters['table/getCellByPath'];
-      const cell = getCellByPath(path);
+      const cellId = this.getCellInfofromPath(path).id;
+      const getCellById = this.store.getters['table/getCellById'];
+      const cell = getCellById(cellId);
       return cell;
+    },
+    getCellInfofromPath(path) {
+      const steps = path.split('-');
+      const cellStep = steps[steps.length - 1];
+      return this.getInfoFromStep(cellStep);
+    },
+    getMainCellInfofromPath(path) {
+      const steps = path.split('-');
+      const mainCellStep = steps[0];
+      return this.getInfoFromStep(mainCellStep);
+    },
+    getParentCellInfofromPath(path) {
+      const steps = path.split('-');
+      const parentCellStep = steps[steps.length - 2];
+      return this.getInfoFromStep(parentCellStep);
     },
     getInfoFromStep(step) {
       const info = step.split(':');
-      return {id: Number(info[0]), index:(info[1]) - 1};
+      return {id: Number(info[0]), index: (info[1]) - 1};
     },
   }
 }

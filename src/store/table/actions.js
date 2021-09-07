@@ -28,19 +28,22 @@ export const updateDropoutCellPath = (context, dropOutCellPath) => {
 /**
  * 
  * @param {*} context 
- * @param {id: Number, cell: CellObject} props 
+ * @param {fromId: Number, toId: Number} props 
  */
-export const addCellById = ({commit, getters}, props) => {
-  commit('addCellById', {props, getters});
+export const addCelltoRefById = ({commit, getters}, props) => {
+  commit('addCelltoRefById', {props, getters});
 }
 
 /**
  * 
  * @param {*} context 
- * @param {path: String, cell: CellObject} props 
+ * @param {CellObject} cell 
  */
- export const addCellByPath = ({commit, getters}, props) => {
-  commit('addCellByPath', {props, getters});
+ export const insertCell = (context, cell) => {
+  context.commit('insertCell', cell);
+  return new Promise((resolve, reject) => {
+    resolve(cell.id);
+  });
 }
 
 /**
@@ -59,6 +62,15 @@ export const updateCellPositionById = ({commit, getters}, props) => {
  */
  export const updateCellPositionByPath = ({commit, getters}, props) => {
   commit('updateCellPositionByPath', {props, getters});
+}
+
+/**
+ * 
+ * @param {*} context 
+ * @param {id: Number, inGroup: Boolean} props
+ */
+ export const updateCellMemberById = ({commit, getters}, props) => {
+  commit('updateCellMemberById', {props, getters});
 }
 
 /**

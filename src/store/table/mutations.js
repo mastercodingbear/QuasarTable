@@ -28,29 +28,23 @@ export const updateDropoutFlag = (state, dropoutFlag) => {
 /**
  * 
  * @param {*} state 
- * @param {id: Number, cell: CellObject} props 
+ * @param {fromId: Number, toId: Number} props 
  */
-export const addCellById = (state, {props, getters}) => {
-  const {id, cell} = props;
-  if (id === 0) {
-    // add new cell
-    state.structure.push(cell);
-  } else {
-    // move cell
-    const toCell = getters.getCellById(id);
-    toCell.references.push(cell);
-  }
+export const addCelltoRefById = (state, {props, getters}) => {
+  const {fromId, toId} = props;
+  // move cell to reference
+  const toCell = getters.getCellById(toId);
+  toCell.references.push(fromId);
 }
 
 /**
  * 
  * @param {*} state 
- * @param {path: String, cell: CellObject} props 
+ * @param {CellObject} cell 
  */
- export const addCellByPath = (state, {props, getters}) => {
-  const {path, cell} = props;
-  const toCell = getters.getCellByPath(path);
-  toCell.references.push(cell);
+export const insertCell = (state, cell) => {
+  cell.id = state.structure.length + 1;
+  state.structure.push(cell);
 }
 
 /**
@@ -73,6 +67,17 @@ export const updateCellPositionById = (state, {props, getters}) => {
   const {path, position} = props;
   const cell = getters.getCellByPath(path);
   cell.position = position;
+}
+
+/**
+ * 
+ * @param {*} context 
+ * @param {id: Number, inGroup: Boolean} props
+ */
+ export const updateCellMemberById = (state, {props, getters}) => {
+  const {id, inGroup} = props;
+  const cell = getters.getCellById(id);
+  cell.inGroup = inGroup;
 }
 
 /**
@@ -125,7 +130,7 @@ export const updateCellReferencesById = (state, {props, getters}) => {
  * @param {String} path
  */
 export const removeCellByPath = (state, {path, getters}) => {
-  const parentCell = getters.getParentCellByChildPath(path);
+  const parentCell = getters.getParentCellByPath(path);
   const steps = path.split('-');
   const childInfo = steps[steps.length - 1].split(':');
   const childIndex = childInfo[1] - 1;
@@ -163,17 +168,14 @@ export const increaseLevelById = (state, {props, getters}) => {
 /**
  * 
  * @param {*} state 
- * @param {id: Number, amount: Number} props 
+ * @param {path: String, amount: Number} props 
  */
  export const increaseLevelByPath = (state, {props, getters}) => {
   const {path, amount} = props;
   const steps = path.split('-');
-  const parentInfo = steps[0].split(':');
-  let cell = state.structure[parentInfo[1] - 1];
-  cell.level += amount;
-  for (let i = 1; i < steps.length; i ++) {
-    const stepInfo = steps[i].split(':');
-    cell = cell.references[stepInfo[1] - 1];
+  for (let i = 0; i < steps.length; i ++) {
+    const cellId = steps[i].split(':')[0];
+    const cell = getters.getCellById(cellId);
     cell.level += amount;
   }
 }

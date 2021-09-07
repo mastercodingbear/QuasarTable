@@ -4,21 +4,34 @@
     @dragenter="onDragEnter"
     @dragover="onDragOver"
     @drop="onDrop" >
+    <q-menu
+        touch-position
+        context-menu
+      >
+      <q-list dense style="min-width: 100px">
+        <q-item clickable v-close-popup>
+          <q-item-section>{{"content page"}}</q-item-section>
+        </q-item>
+      </q-list>
+    </q-menu>
     <div 
       class="contentContainer" 
       ref="contentPage" >
-      <group-element v-for="(el, index) in data" 
-        :key="el.content" 
-        :elementId="el.id" 
-        :content="el.content" 
-        :level="el.level" 
-        :inGroup="el.inGroup"
-        :references="el.references"
-        :displayType="el.type"
-        :displayValue="el.value"
-        :path="`${el.id}`"
-        :index="index + 1"
-        :position="el.position" />
+      <template v-for="(el, index) in data">
+        <group-element
+          v-if="!el.inGroup"
+          :key="el.content" 
+          :elementId="el.id" 
+          :content="el.content" 
+          :level="el.level" 
+          :inGroup="el.inGroup"
+          :references="el.references"
+          :displayType="el.type"
+          :displayValue="el.value"
+          :path="`${el.id}`"
+          :index="index + 1"
+          :position="el.position" />
+      </template>
     </div>
   </q-page>
 </template>

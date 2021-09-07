@@ -12,39 +12,44 @@ export const getDropoutPath = (state) => {
 
 export const getCellById = (state) => (id) => {
   let cell = {};
-  cell = findCellById(id, state.structure);
+  cell = findCellById(Number(id), state.structure);
   return cell;
 }
 
 export const getCellByPath = (state) => (path) => {
   const steps = path.split('-');
-  let cell = state.structure[getInfofromStep(steps[0]).index];
-  for(let i = 1; i < steps.length; i ++) {
-    cell = cell.references[getInfofromStep(steps[i]).index];
-  }
+  const cellId = getInfofromStep(steps[steps.length - 1]).id;
+  const cell = findCellById(cellId, state.structure);
   return cell;
 }
 
-export const getParentCellByChildPath = (state) => (path) => {
+export const getParentCellByPath = (state) => (path) => {
   const steps = path.split('-');
   if (steps.length === 1) {
     return state.structure;
   }
-  let parentCell = state.structure[getInfofromStep(steps[0]).index];
-  for(let i = 1; i < steps.length - 1; i ++) {
-    parentCell = parentCell.references[getInfofromStep(steps[i]).index];
-  }
+  const parentCellId = getInfofromStep(steps[steps.length - 2]).id;
+  let parentCell = findCellById(parentCellId, state.structure);
   return parentCell;
 }
+
+// const findCellById = (id, array) => {
+//   for(let i = 0; i < array.length; i ++) {
+//     if (array[i].id === id) {
+//       return array[i];
+//     } else if(array[i].references.length > 0) {
+//       let temp = findCellById(id, array[i].references);
+//       if (Object.keys(temp).length > 0)
+//         return temp;
+//     }
+//   }
+//   return {};
+// }
 
 const findCellById = (id, array) => {
   for(let i = 0; i < array.length; i ++) {
     if (array[i].id === id) {
       return array[i];
-    } else if(array[i].references.length > 0) {
-      let temp = findCellById(id, array[i].references);
-      if (Object.keys(temp).length > 0)
-        return temp;
     }
   }
   return {};
